@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View detailed information about this handcrafted Kondappali toy including dimensions, artisan story, and more.">
+    <title>Product Details - Kondappali Toys</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <span>Free shipping on orders above ₹2,000</span>
+                <span>📞 +91 98765 43210</span>
+            </div>
+        </div>
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🎨</span>
+                    <span>Kondappali Toys</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html" class="active">Shop</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-link">
+                        🛒
+                        <span class="cart-count">0</span>
+                    </a>
+                    <button class="menu-toggle" aria-label="Toggle menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Breadcrumb -->
+        <section class="page-header" style="padding: var(--space-lg) 0;">
+            <div class="container">
+                <nav class="breadcrumb" id="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <a href="products.html">Shop</a>
+                    <span>/</span>
+                    <span id="productBreadcrumb">Product</span>
+                </nav>
+            </div>
+        </section>
+
+        <!-- Product Detail Section -->
+        <section class="product-detail">
+            <div class="container">
+                <div class="product-detail-grid" id="productDetail">
+                    <!-- Product content will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Products Section -->
+        <section class="related-products section">
+            <div class="container">
+                <h2 class="section-title">You May Also Like</h2>
+                <p class="section-subtitle">More handcrafted treasures from our collection</p>
+                <div class="products-carousel" id="relatedProducts">
+                    <!-- Related products will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🎨</span>
+                        <span>Kondappali Toys</span>
+                    </a>
+                    <p>Preserving and promoting the ancient art of Kondappali toy making since 1990. Every toy is a masterpiece of Indian folk art.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="YouTube">🎬</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="products.html?category=deities">Deities</a></li>
+                        <li><a href="products.html?category=animals">House Warming Gifts</a></li>
+                        <li><a href="products.html?category=village-life">Village Life</a></li>
+                        <li><a href="products.html?category=decorative">Decorative</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Care Instructions</a></li>
+                    </ul>
+                    <div class="payment-methods">
+                        <h4>We Accept</h4>
+                        <div class="payment-icons">
+                            <span class="payment-icon visa">💳 Visa</span>
+                            <span class="payment-icon mastercard">💳 MC</span>
+                            <span class="payment-icon upi">📱 UPI</span>
+                            <span class="payment-icon cod">💵 COD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <span class="trust-badge-icon">🔒</span>
+                    <span>Secure Payments</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-badge-icon">✅</span>
+                    <span>Genuine Products</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="trust-badge-icon">🚚</span>
+                    <span>Pan India Delivery</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2024 Kondappali Toys. All rights reserved.</span>
+                <span>Made with ❤️ in Andhra Pradesh, India</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Get product ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+
+        let quantity = 1;
+
+        // Load product detail
+        document.addEventListener('DOMContentLoaded', () => {
+            const product = products.find(p => p.id === productId);
+
+            if (!product) {
+                document.getElementById('productDetail').innerHTML = `
+                    <div class="no-products" style="grid-column: 1 / -1;">
+                        <span class="no-products-icon">🔍</span>
+                        <h3>Product Not Found</h3>
+                        <p>Sorry, we couldn't find the product you're looking for.</p>
+                        <a href="products.html" class="btn btn-primary">Browse Products</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Update page title and breadcrumb
+            document.title = `${product.name} - Kondappali Toys`;
+            document.getElementById('productBreadcrumb').textContent = product.name;
+
+            // Calculate discount
+            const discount = Math.round((1 - product.price / product.originalPrice) * 100);
+
+            // Render product detail
+            document.getElementById('productDetail').innerHTML = `
+                <div class="product-gallery">
+                    <div class="main-image">
+                        <img src="${product.image}" alt="${product.name}" class="product-img" id="mainProductImage"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'product-placeholder\\'><span class=\\'placeholder-icon\\'>🎨</span><span class=\\'placeholder-text\\'>${product.name}</span></div>';">
+                    </div>
+                    <div class="thumbnail-images">
+                        ${product.images.map((img, i) => `
+                            <div class="thumbnail ${i === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                                <img src="${img}" alt="${product.name} view ${i+1}" class="product-img"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'product-placeholder small\\'><span class=\\'placeholder-icon\\'>🎨</span></div>';">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="product-details">
+                    <h1>${product.name}</h1>
+                    <div class="product-meta">
+                        <div class="detail-rating">
+                            ${createStarRating(product.rating)}
+                            <span>${product.rating} (${product.reviews} reviews)</span>
+                        </div>
+                        <span class="text-secondary">|</span>
+                        <span class="${product.inStock ? 'text-primary' : 'text-secondary'}">
+                            ${product.inStock ? '✓ In Stock' : '✗ Out of Stock'}
+                        </span>
+                    </div>
+                    <div class="detail-price">
+                        <span class="current-price">${formatCurrency(product.price)}</span>
+                        ${product.originalPrice > product.price ?
+                            `<span class="original-price">${formatCurrency(product.originalPrice)}</span>
+                             <span class="discount">Save ${discount}%</span>` : ''}
+                    </div>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-specs">
+                        <div class="spec-row">
+                            <span class="spec-label">Dimensions</span>
+                            <span class="spec-value">${product.dimensions}</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">Weight</span>
+                            <span class="spec-value">${product.weight}</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">Category</span>
+                            <span class="spec-value">${getCategoryName(product.category)}</span>
+                        </div>
+                    </div>
+                    <div class="quantity-selector">
+                        <label>Quantity:</label>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="updateQuantity(-1)">−</button>
+                            <input type="number" id="quantity" value="1" min="1" max="10" onchange="setQuantity(this.value)">
+                            <button class="qty-btn" onclick="updateQuantity(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="add-to-cart-section">
+                        <button class="btn btn-primary" onclick="addToCartDetail()" ${!product.inStock ? 'disabled' : ''}>
+                            ${product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="buyNow()">
+                            Buy Now
+                        </button>
+                    </div>
+                    <div class="artisan-info">
+                        <h3>About the Artisan</h3>
+                        <p>This exquisite piece was handcrafted by <strong>${product.artisan}</strong>, a master craftsman with over 25 years of experience in Kondappali toy making. Each piece takes several days to complete, from carving the soft Tella Poniki wood to applying the final coat of vibrant natural dyes.</p>
+                        <div class="artisan-badge">
+                            <span>🏆</span>
+                            <span>Certified Master Craftsman</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Load related products
+            const relatedProducts = products
+                .filter(p => p.category === product.category && p.id !== product.id)
+                .slice(0, 4);
+
+            if (relatedProducts.length < 4) {
+                const additional = products
+                    .filter(p => p.id !== product.id && !relatedProducts.includes(p))
+                    .slice(0, 4 - relatedProducts.length);
+                relatedProducts.push(...additional);
+            }
+
+            document.getElementById('relatedProducts').innerHTML =
+                relatedProducts.map(p => createProductCard(p)).join('');
+        });
+
+        // Quantity functions
+        function updateQuantity(change) {
+            quantity = Math.max(1, Math.min(10, quantity + change));
+            document.getElementById('quantity').value = quantity;
+        }
+
+        function setQuantity(value) {
+            quantity = Math.max(1, Math.min(10, parseInt(value) || 1));
+            document.getElementById('quantity').value = quantity;
+        }
+
+        // Add to cart from detail page
+        function addToCartDetail() {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                Cart.add(product, quantity);
+            }
+        }
+
+        // Buy now
+        function buyNow() {
+            addToCartDetail();
+            window.location.href = 'checkout.html';
+        }
+
+        // Change main image
+        function changeMainImage(src, thumbnail) {
+            document.getElementById('mainProductImage').src = src;
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+    </script>
+</body>
+</html>

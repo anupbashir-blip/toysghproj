@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Theme Builder - Advanced</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #722F37 0%, #8B1E4F 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .builder-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        /* Element Palette - Scrollable Sidebar */
+        .palette {
+            width: 300px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .palette h2 {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            color: #ccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .palette-section {
+            margin-bottom: 20px;
+        }
+
+        .palette-section h3 {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .palette-section h3 .badge {
+            background: #D4AF37;
+            color: #000;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .palette-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .palette-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .palette-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #D4AF37;
+            transform: scale(1.03);
+        }
+
+        .palette-item:active {
+            cursor: grabbing;
+        }
+
+        .palette-item .icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .palette-item .label {
+            font-size: 0.65rem;
+            color: #aaa;
+            line-height: 1.2;
+        }
+
+        .palette-item.animated .icon {
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* CSS Preview Elements in Palette */
+        .palette-item .css-preview {
+            transform: scale(0.4);
+            transform-origin: center;
+            pointer-events: none;
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .canvas-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .canvas-header label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .canvas-header select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+        }
+
+        .canvas-header select option {
+            background: #1a1a2e;
+        }
+
+        .canvas-header input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* The Scene Canvas - LARGER */
+        .scene-canvas {
+            width: 700px;
+            height: 550px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 5px #D4AF37,
+                0 30px 70px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .scene-canvas.drag-over {
+            box-shadow:
+                0 0 0 5px #4CAF50,
+                0 0 40px rgba(76, 175, 80, 0.5),
+                0 30px 70px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sky Backgrounds */
+        .sky-day {
+            background: linear-gradient(180deg, #4A90D9 0%, #87CEEB 50%, #E8F4FF 100%);
+        }
+
+        .sky-sunset {
+            background: linear-gradient(180deg, #FF6B6B 0%, #FF8E53 40%, #FFE66D 100%);
+        }
+
+        .sky-night {
+            background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        }
+
+        .sky-morning {
+            background: linear-gradient(180deg, #FFB347 0%, #FFCC33 30%, #87CEEB 70%, #B0E0E6 100%);
+        }
+
+        .sky-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 42%;
+            transition: background 0.5s;
+        }
+
+        /* Ground Layer - Base */
+        .ground-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            transition: background 0.5s;
+        }
+
+        /* Ground Types */
+        .ground-grass {
+            background: linear-gradient(180deg,
+                #8BC34A 0%,
+                #7CB342 20%,
+                #689F38 40%,
+                #558B2F 55%,
+                #6D4C41 75%,
+                #5D4037 100%
+            );
+        }
+
+        .ground-dry {
+            background: linear-gradient(180deg,
+                #C5B358 0%,
+                #B8A848 20%,
+                #A69938 40%,
+                #8B7355 60%,
+                #6D4C41 80%,
+                #5D4037 100%
+            );
+        }
+
+        .ground-soil {
+            background: linear-gradient(180deg,
+                #8D6E63 0%,
+                #795548 25%,
+                #6D4C41 50%,
+                #5D4037 75%,
+                #4E342E 100%
+            );
+        }
+
+        .ground-sandy {
+            background: linear-gradient(180deg,
+                #FFCC80 0%,
+                #FFB74D 25%,
+                #D4A574 50%,
+                #C49A6C 75%,
+                #8D6E63 100%
+            );
+        }
+
+        .ground-farm {
+            background: linear-gradient(180deg,
+                #81C784 0%,
+                #66BB6A 15%,
+                #8D6E63 30%,
+                #795548 50%,
+                #689F38 65%,
+                #558B2F 80%,
+                #5D4037 100%
+            );
+        }
+
+        .ground-plain {
+            background: linear-gradient(180deg,
+                #66BB6A 0%,
+                #4CAF50 50%,
+                #388E3C 100%
+            );
+        }
+
+        .ground-none {
+            background: transparent;
+        }
+
+        /* Sky clear option */
+        .sky-clear {
+            background: linear-gradient(180deg, #1E88E5 0%, #64B5F6 50%, #BBDEFB 100%);
+        }
+
+        /* Static Sky Elements */
+        .static-sun {
+            position: absolute;
+            top: 8%;
+            right: 10%;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #FFF176 0%, #FFD54F 40%, #FFB300 70%, #FF8F00 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 193, 7, 0.8), 0 0 100px rgba(255, 152, 0, 0.4);
+        }
+
+        .static-moon {
+            position: absolute;
+            top: 10%;
+            right: 12%;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #FFF8E1 0%, #FFECB3 50%, #E0E0E0 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255, 248, 225, 0.6);
+            display: none;
+        }
+
+        .static-stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 42%;
+            display: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        .star:nth-child(1) { top: 12%; left: 8%; }
+        .star:nth-child(2) { top: 22%; left: 20%; animation-delay: 0.5s; }
+        .star:nth-child(3) { top: 8%; left: 35%; animation-delay: 1s; }
+        .star:nth-child(4) { top: 28%; left: 50%; animation-delay: 0.3s; }
+        .star:nth-child(5) { top: 15%; left: 65%; animation-delay: 0.8s; }
+        .star:nth-child(6) { top: 32%; left: 80%; animation-delay: 1.2s; }
+        .star:nth-child(7) { top: 5%; left: 55%; animation-delay: 0.6s; }
+        .star:nth-child(8) { top: 20%; left: 90%; animation-delay: 1.5s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Dropped Elements */
+        .dropped-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            transition: filter 0.2s;
+            z-index: 10;
+        }
+
+        .dropped-element:hover {
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+        }
+
+        .dropped-element.selected {
+            outline: 2px dashed #FFD700;
+            outline-offset: 5px;
+        }
+
+        .dropped-element .delete-btn {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 24px;
+            height: 24px;
+            background: #ff4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .dropped-element:hover .delete-btn {
+            display: flex;
+        }
+
+        /* Element Styles */
+        .element-icon {
+            font-size: 3.5rem;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+        }
+
+        .element-icon.small { font-size: 2rem; }
+        .element-icon.medium { font-size: 3rem; }
+        .element-icon.large { font-size: 4.5rem; }
+        .element-icon.xlarge { font-size: 6rem; }
+
+        /* Animated Element Classes */
+        .anim-bounce .element-icon { animation: elemBounce 1s ease-in-out infinite; }
+        .anim-float .element-icon { animation: elemFloat 2s ease-in-out infinite; }
+        .anim-sway .element-icon { animation: elemSway 3s ease-in-out infinite; }
+        .anim-walk .element-icon { animation: elemWalk 0.5s ease-in-out infinite; }
+        .anim-fly .element-icon { animation: elemFly 2s ease-in-out infinite; }
+        .anim-pulse .element-icon { animation: elemPulse 1.5s ease-in-out infinite; }
+        .anim-graze .element-icon { animation: elemGraze 2s ease-in-out infinite; }
+
+        @keyframes elemBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes elemFloat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+        @keyframes elemSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+        @keyframes elemWalk { 0%, 100% { transform: translateY(0); } 25% { transform: translateY(-4px) rotate(-2deg); } 75% { transform: translateY(-4px) rotate(2deg); } }
+        @keyframes elemFly { 0%, 100% { transform: translateY(0) translateX(0); } 25% { transform: translateY(-15px) translateX(8px); } 50% { transform: translateY(-8px) translateX(15px); } 75% { transform: translateY(-18px) translateX(8px); } }
+        @keyframes elemPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes elemGraze { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(6deg); } }
+
+        /* ========== CSS-DRAWN ELEMENTS ========== */
+
+        /* CSS Tree - Multiple Styles */
+        .css-tree {
+            position: relative;
+            width: 70px;
+            height: 120px;
+        }
+
+        .css-tree .trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 40px;
+            background: linear-gradient(90deg, #5D4037, #8D6E63, #5D4037);
+            border-radius: 3px;
+        }
+
+        .css-tree .foliage {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 85px;
+            background: radial-gradient(ellipse, #66BB6A 0%, #43A047 50%, #2E7D32 100%);
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        /* Pine Tree */
+        .css-pine {
+            position: relative;
+            width: 60px;
+            height: 110px;
+        }
+
+        .css-pine .trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 25px;
+            background: linear-gradient(90deg, #5D4037, #795548, #5D4037);
+        }
+
+        .css-pine .layer {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: solid transparent;
+            border-right: solid transparent;
+            border-bottom: solid #2E7D32;
+        }
+
+        .css-pine .layer-1 { bottom: 20px; border-left-width: 28px; border-right-width: 28px; border-bottom-width: 35px; }
+        .css-pine .layer-2 { bottom: 45px; border-left-width: 22px; border-right-width: 22px; border-bottom-width: 30px; border-bottom-color: #388E3C; }
+        .css-pine .layer-3 { bottom: 65px; border-left-width: 16px; border-right-width: 16px; border-bottom-width: 25px; border-bottom-color: #43A047; }
+
+        /* Palm Tree */
+        .css-palm {
+            position: relative;
+            width: 80px;
+            height: 130px;
+        }
+
+        .css-palm .trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 70px;
+            background: linear-gradient(90deg, #6D4C41, #8D6E63, #6D4C41);
+            border-radius: 5px;
+        }
+
+        .css-palm .frond {
+            position: absolute;
+            width: 40px;
+            height: 8px;
+            background: linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%);
+            border-radius: 50%;
+            top: 50px;
+            left: 50%;
+            transform-origin: 0% 50%;
+        }
+
+        .css-palm .frond:nth-child(2) { transform: translateX(-50%) rotate(-30deg); }
+        .css-palm .frond:nth-child(3) { transform: translateX(-50%) rotate(-60deg); }
+        .css-palm .frond:nth-child(4) { transform: translateX(-50%) rotate(30deg); left: 50%; transform-origin: 100% 50%; }
+        .css-palm .frond:nth-child(5) { transform: translateX(-50%) rotate(60deg); left: 50%; transform-origin: 100% 50%; }
+        .css-palm .frond:nth-child(6) { transform: translateX(-50%) rotate(0deg); width: 50px; }
+
+        /* CSS Hut */
+        .css-hut {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .css-hut .hut-roof {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 40px solid #D84315;
+            position: absolute;
+            top: 0;
+            left: -5px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+        }
+
+        .css-hut .hut-body {
+            position: absolute;
+            bottom: 0;
+            width: 90px;
+            height: 50px;
+            background: linear-gradient(180deg, #FFCC80 0%, #FFB74D 100%);
+            border-radius: 0 0 5px 5px;
+        }
+
+        .css-hut .hut-door {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 30px;
+            background: #5D4037;
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* Temple */
+        .css-temple {
+            position: relative;
+            width: 100px;
+            height: 120px;
+        }
+
+        .css-temple .gopuram {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid #FFD54F;
+        }
+
+        .css-temple .body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 70px;
+            background: linear-gradient(180deg, #FFF8E1 0%, #FFE082 100%);
+            border: 3px solid #FFB300;
+        }
+
+        .css-temple .pillars {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+
+        .css-temple .pillar {
+            width: 8px;
+            height: 50px;
+            background: linear-gradient(90deg, #8D6E63, #BCAAA4, #8D6E63);
+        }
+
+        /* Clouds */
+        .css-cloud {
+            position: relative;
+            width: 90px;
+            height: 35px;
+            background: white;
+            border-radius: 30px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .css-cloud::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            top: -20px;
+            left: 15px;
+        }
+
+        .css-cloud::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            top: -12px;
+            left: 45px;
+        }
+
+        /* ========== BULLOCK CARTS - MULTIPLE STYLES ========== */
+
+        /* Cart Style 1 - Traditional */
+        .bullock-cart-1 {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .bullock-cart-1 .bullock-emoji {
+            font-size: 3rem;
+            filter: drop-shadow(3px 5px 5px rgba(0,0,0,0.3));
+            animation: bullockWalk 0.5s ease-in-out infinite;
+        }
+
+        .bullock-cart-1 .cart-part {
+            position: relative;
+            margin-left: -12px;
+            margin-bottom: 5px;
+        }
+
+        .bullock-cart-1 .cart-body {
+            width: 80px;
+            height: 45px;
+            background: linear-gradient(180deg, #D7CCC8 0%, #A1887F 15%, #8D6E63 40%, #6D4C41 80%, #5D4037 100%);
+            border: 3px solid #4E342E;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .bullock-cart-1 .cart-body::after {
+            content: '🌾';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        .bullock-cart-1 .cart-pole {
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 8px;
+            background: linear-gradient(180deg, #8D6E63 0%, #5D4037 100%);
+            border-radius: 4px;
+        }
+
+        .bullock-cart-1 .cart-wheel {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: radial-gradient(circle, #BCAAA4 0%, #8D6E63 40%, #5D4037 80%, #3E2723 100%);
+            border: 4px solid #6D4C41;
+            border-radius: 50%;
+            bottom: -12px;
+        }
+
+        .bullock-cart-1 .wheel-l { left: 8px; }
+        .bullock-cart-1 .wheel-r { right: 8px; }
+
+        .bullock-cart-1.moving { animation: cartTravel 15s linear infinite; }
+        .bullock-cart-1.moving .cart-wheel { animation: wheelRoll 0.5s linear infinite; }
+
+        /* Cart Style 2 - Decorated */
+        .bullock-cart-2 {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .bullock-cart-2 .bullock-pair {
+            font-size: 2.5rem;
+            filter: drop-shadow(3px 5px 5px rgba(0,0,0,0.3));
+        }
+
+        .bullock-cart-2 .bullock-pair span:first-child {
+            margin-right: -15px;
+        }
+
+        .bullock-cart-2 .fancy-cart {
+            position: relative;
+            margin-left: -10px;
+            margin-bottom: 8px;
+        }
+
+        .bullock-cart-2 .cart-base {
+            width: 100px;
+            height: 50px;
+            background: linear-gradient(180deg, #C62828 0%, #B71C1C 50%, #8B0000 100%);
+            border: 3px solid #FFD700;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .bullock-cart-2 .cart-canopy {
+            position: absolute;
+            top: -30px;
+            left: 5px;
+            width: 90px;
+            height: 30px;
+            background: linear-gradient(180deg, #FF5722 0%, #E64A19 100%);
+            border-radius: 50% 50% 0 0;
+            border: 2px solid #FFD700;
+        }
+
+        .bullock-cart-2 .cart-decor {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+        }
+
+        .bullock-cart-2 .wheel {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #FFD700 0%, #FFA000 50%, #FF6F00 100%);
+            border: 4px solid #5D4037;
+            border-radius: 50%;
+            bottom: -14px;
+        }
+
+        .bullock-cart-2 .wheel-l { left: 10px; }
+        .bullock-cart-2 .wheel-r { right: 10px; }
+
+        /* Cart Style 3 - Simple Farmer */
+        .bullock-cart-3 {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .bullock-cart-3 .ox {
+            font-size: 2.8rem;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+        }
+
+        .bullock-cart-3 .simple-cart {
+            position: relative;
+            margin-left: -8px;
+            margin-bottom: 6px;
+        }
+
+        .bullock-cart-3 .cart-box {
+            width: 70px;
+            height: 35px;
+            background: linear-gradient(180deg, #A1887F 0%, #795548 50%, #5D4037 100%);
+            border: 2px solid #3E2723;
+            border-radius: 3px;
+        }
+
+        .bullock-cart-3 .cart-box::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 6px;
+            background: #5D4037;
+            border-radius: 3px;
+        }
+
+        .bullock-cart-3 .whl {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle, #8D6E63 0%, #5D4037 70%);
+            border: 3px solid #3E2723;
+            border-radius: 50%;
+            bottom: -10px;
+        }
+
+        .bullock-cart-3 .whl-l { left: 5px; }
+        .bullock-cart-3 .whl-r { right: 5px; }
+
+        /* Cart Style 4 - Royal */
+        .bullock-cart-4 {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .bullock-cart-4 .royal-ox {
+            font-size: 3.2rem;
+            filter: drop-shadow(3px 5px 6px rgba(0,0,0,0.4));
+        }
+
+        .bullock-cart-4 .royal-cart {
+            position: relative;
+            margin-left: -15px;
+            margin-bottom: 10px;
+        }
+
+        .bullock-cart-4 .royal-body {
+            width: 110px;
+            height: 60px;
+            background: linear-gradient(180deg, #7B1FA2 0%, #6A1B9A 50%, #4A148C 100%);
+            border: 4px solid #FFD700;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .bullock-cart-4 .royal-top {
+            position: absolute;
+            top: -25px;
+            left: 10px;
+            width: 90px;
+            height: 25px;
+            background: linear-gradient(180deg, #9C27B0 0%, #7B1FA2 100%);
+            border-radius: 15px 15px 0 0;
+            border: 3px solid #FFD700;
+            border-bottom: none;
+        }
+
+        .bullock-cart-4 .royal-emblem {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+        }
+
+        .bullock-cart-4 .gold-wheel {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: radial-gradient(circle, #FFD700 0%, #FFC107 50%, #FF8F00 100%);
+            border: 5px solid #5D4037;
+            border-radius: 50%;
+            bottom: -16px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .bullock-cart-4 .gold-wheel-l { left: 10px; }
+        .bullock-cart-4 .gold-wheel-r { right: 10px; }
+
+        @keyframes bullockWalk {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes cartTravel {
+            0% { left: -18% !important; }
+            100% { left: 105% !important; }
+        }
+
+        @keyframes wheelRoll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toys Display Box */
+        .toys-box {
+            background: rgba(255,255,255,0.95);
+            padding: 12px 18px;
+            border-radius: 15px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            border: 3px solid rgba(212, 175, 55, 0.6);
+        }
+
+        .toys-box .toy-item {
+            font-size: 2.2rem;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .toys-box .toy-item:hover {
+            transform: scale(1.2) translateY(-5px);
+        }
+
+        /* Scene Label */
+        .scene-label-el {
+            background: linear-gradient(135deg, #722F37, #8B1E4F);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 5px 20px rgba(114, 47, 55, 0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* Pond */
+        .css-pond {
+            width: 120px;
+            height: 60px;
+            background: radial-gradient(ellipse, #4FC3F7 0%, #0288D1 50%, #01579B 100%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .css-pond::before {
+            content: '🪷';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 1.5rem;
+        }
+
+        .css-pond::after {
+            content: '🪷';
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.2rem;
+        }
+
+        /* Well */
+        .css-well {
+            position: relative;
+            width: 60px;
+            height: 80px;
+        }
+
+        .css-well .well-base {
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(180deg, #9E9E9E 0%, #757575 50%, #616161 100%);
+            border-radius: 50%;
+            border: 3px solid #424242;
+        }
+
+        .css-well .well-roof {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 20px;
+            background: #8D6E63;
+            border-radius: 3px;
+        }
+
+        .css-well .well-post {
+            position: absolute;
+            bottom: 35px;
+            width: 6px;
+            height: 45px;
+            background: #5D4037;
+        }
+
+        .css-well .well-post-l { left: 10px; }
+        .css-well .well-post-r { right: 10px; }
+
+        /* Haystack */
+        .css-haystack {
+            position: relative;
+            width: 70px;
+            height: 55px;
+        }
+
+        .css-haystack .hay-body {
+            width: 70px;
+            height: 55px;
+            background: linear-gradient(180deg, #FFD54F 0%, #FFCA28 30%, #C9A227 60%, #8D6E63 100%);
+            border-radius: 50% 50% 40% 40%;
+            position: relative;
+        }
+
+        .css-haystack .hay-body::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            right: 10px;
+            height: 25px;
+            background: repeating-linear-gradient(45deg,
+                transparent 0px, transparent 3px,
+                rgba(139, 90, 43, 0.3) 3px, rgba(139, 90, 43, 0.3) 6px
+            );
+            border-radius: 50%;
+        }
+
+        /* Fence */
+        .css-fence {
+            display: flex;
+            gap: 8px;
+        }
+
+        .css-fence .fence-post {
+            width: 8px;
+            height: 50px;
+            background: linear-gradient(90deg, #8D6E63 0%, #A1887F 50%, #8D6E63 100%);
+            border-radius: 2px 2px 0 0;
+            position: relative;
+        }
+
+        .css-fence .fence-post::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -2px;
+            width: 12px;
+            height: 8px;
+            background: linear-gradient(180deg, #A1887F 0%, #8D6E63 100%);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .css-fence .fence-bar {
+            position: absolute;
+            left: -5px;
+            width: 75px;
+            height: 6px;
+            background: linear-gradient(180deg, #A1887F 0%, #795548 100%);
+            border-radius: 2px;
+        }
+
+        .css-fence .fence-bar-1 { top: 10px; }
+        .css-fence .fence-bar-2 { top: 30px; }
+
+        /* Scarecrow */
+        .css-scarecrow {
+            position: relative;
+            width: 60px;
+            height: 100px;
+        }
+
+        .css-scarecrow .scare-pole {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 100px;
+            background: linear-gradient(90deg, #5D4037 0%, #795548 50%, #5D4037 100%);
+            bottom: 0;
+        }
+
+        .css-scarecrow .scare-arms {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 6px;
+            background: #5D4037;
+        }
+
+        .css-scarecrow .scare-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #FFCC80 0%, #FFB74D 70%, #FF8F00 100%);
+            border-radius: 50%;
+        }
+
+        .css-scarecrow .scare-hat {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            background: #5D4037;
+            border-radius: 5px;
+        }
+
+        .css-scarecrow .scare-hat::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: -5px;
+            width: 50px;
+            height: 5px;
+            background: #5D4037;
+            border-radius: 3px;
+        }
+
+        .css-scarecrow .scare-shirt {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 35px;
+            background: #1565C0;
+            border-radius: 5px 5px 0 0;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            color: #aaa;
+            z-index: 100;
+        }
+
+        .instructions kbd {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 0 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Village Theme Builder</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="clearCanvas()">Clear All</button>
+            <button class="btn btn-primary" onclick="exportDesign()">✓ Use This Design</button>
+        </div>
+    </div>
+
+    <div class="builder-container">
+        <!-- Element Palette -->
+        <div class="palette">
+            <h2>Drag Elements</h2>
+
+            <!-- Bullock Carts - Featured -->
+            <div class="palette-section">
+                <h3>🐂 Bullock Carts <span class="badge">4 TYPES</span></h3>
+                <div class="palette-items" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="palette-item" draggable="true" data-type="cart1" data-name="Traditional" style="min-height: 80px;">
+                        <div class="cart-preview-mini" style="display: flex; align-items: center; gap: 2px; transform: scale(0.6);">
+                            <span style="font-size: 1.5rem;">🐂</span>
+                            <div style="width: 35px; height: 20px; background: #8D6E63; border: 2px solid #5D4037; border-radius: 3px; position: relative;">
+                                <div style="position: absolute; bottom: -6px; left: 3px; width: 10px; height: 10px; background: #795548; border: 2px solid #5D4037; border-radius: 50%;"></div>
+                                <div style="position: absolute; bottom: -6px; right: 3px; width: 10px; height: 10px; background: #795548; border: 2px solid #5D4037; border-radius: 50%;"></div>
+                            </div>
+                        </div>
+                        <span class="label">Traditional</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="cart2" data-name="Decorated" style="min-height: 80px;">
+                        <div class="cart-preview-mini" style="display: flex; align-items: center; gap: 2px; transform: scale(0.6);">
+                            <span style="font-size: 1.3rem;">🐂🐂</span>
+                            <div style="width: 40px; height: 25px; background: #C62828; border: 2px solid #FFD700; border-radius: 5px; position: relative;">
+                                <div style="position: absolute; top: -12px; left: 3px; width: 34px; height: 12px; background: #FF5722; border-radius: 50% 50% 0 0; border: 1px solid #FFD700;"></div>
+                            </div>
+                        </div>
+                        <span class="label">Decorated</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="cart3" data-name="Simple" style="min-height: 80px;">
+                        <div class="cart-preview-mini" style="display: flex; align-items: center; gap: 2px; transform: scale(0.6);">
+                            <span style="font-size: 1.5rem;">🐃</span>
+                            <div style="width: 30px; height: 16px; background: #795548; border: 2px solid #3E2723; border-radius: 2px;"></div>
+                        </div>
+                        <span class="label">Farmer Cart</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="cart4" data-name="Royal" style="min-height: 80px;">
+                        <div class="cart-preview-mini" style="display: flex; align-items: center; gap: 2px; transform: scale(0.6);">
+                            <span style="font-size: 1.5rem;">🐂</span>
+                            <div style="width: 45px; height: 28px; background: #7B1FA2; border: 3px solid #FFD700; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 0.8rem;">👑</span>
+                            </div>
+                        </div>
+                        <span class="label">Royal Cart</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSS Structures -->
+            <div class="palette-section">
+                <h3>🏠 Structures <span class="badge">CSS</span></h3>
+                <div class="palette-items">
+                    <div class="palette-item" draggable="true" data-type="hut" data-name="Hut">
+                        <span class="icon">🏠</span>
+                        <span class="label">Village Hut</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="temple" data-name="Temple">
+                        <span class="icon">🛕</span>
+                        <span class="label">Temple</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="well" data-name="Well">
+                        <span class="icon">🪣</span>
+                        <span class="label">Well</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="pond" data-name="Pond">
+                        <span class="icon">💧</span>
+                        <span class="label">Pond</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trees - CSS -->
+            <div class="palette-section">
+                <h3>🌳 Trees <span class="badge">CSS</span></h3>
+                <div class="palette-items">
+                    <div class="palette-item" draggable="true" data-type="tree" data-name="Tree">
+                        <span class="icon">🌳</span>
+                        <span class="label">Round Tree</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="pine" data-name="Pine">
+                        <span class="icon">🌲</span>
+                        <span class="label">Pine Tree</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="palm" data-name="Palm">
+                        <span class="icon">🌴</span>
+                        <span class="label">Palm Tree</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="cloud" data-name="Cloud">
+                        <span class="icon">☁️</span>
+                        <span class="label">Cloud</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- People -->
+            <div class="palette-section">
+                <h3>👨‍🌾 People</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="👨‍🌾" data-name="Farmer" data-anim="walk" data-size="large">
+                        <span class="icon">👨‍🌾</span>
+                        <span class="label">Farmer</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="👩‍🌾" data-name="Woman" data-anim="walk" data-size="large">
+                        <span class="icon">👩‍🌾</span>
+                        <span class="label">Woman</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="👧" data-name="Girl" data-anim="bounce" data-size="medium">
+                        <span class="icon">👧</span>
+                        <span class="label">Girl</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="👦" data-name="Boy" data-anim="bounce" data-size="medium">
+                        <span class="icon">👦</span>
+                        <span class="label">Boy</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="💃" data-name="Dancer" data-anim="bounce" data-size="large">
+                        <span class="icon">💃</span>
+                        <span class="label">Dancer</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🧓" data-name="Elder" data-anim="sway" data-size="large">
+                        <span class="icon">🧓</span>
+                        <span class="label">Elder</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animals -->
+            <div class="palette-section">
+                <h3>🐄 Animals</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="🐄" data-name="Cow" data-anim="graze" data-size="large">
+                        <span class="icon">🐄</span>
+                        <span class="label">Cow</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐂" data-name="Bull" data-anim="walk" data-size="large">
+                        <span class="icon">🐂</span>
+                        <span class="label">Bull</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐃" data-name="Buffalo" data-anim="graze" data-size="large">
+                        <span class="icon">🐃</span>
+                        <span class="label">Buffalo</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐕" data-name="Dog" data-anim="bounce" data-size="medium">
+                        <span class="icon">🐕</span>
+                        <span class="label">Dog</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐐" data-name="Goat" data-anim="graze" data-size="medium">
+                        <span class="icon">🐐</span>
+                        <span class="label">Goat</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐓" data-name="Rooster" data-anim="walk" data-size="medium">
+                        <span class="icon">🐓</span>
+                        <span class="label">Rooster</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Birds -->
+            <div class="palette-section">
+                <h3>🦚 Birds</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="🦚" data-name="Peacock" data-anim="pulse" data-size="xlarge">
+                        <span class="icon">🦚</span>
+                        <span class="label">Peacock</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🕊️" data-name="Dove" data-anim="fly" data-size="medium">
+                        <span class="icon">🕊️</span>
+                        <span class="label">Dove</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🦜" data-name="Parrot" data-anim="fly" data-size="medium">
+                        <span class="icon">🦜</span>
+                        <span class="label">Parrot</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🦢" data-name="Swan" data-anim="float" data-size="large">
+                        <span class="icon">🦢</span>
+                        <span class="label">Swan</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kondapalli Toys -->
+            <div class="palette-section">
+                <h3>🎨 Kondapalli Toys</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="🐘" data-name="Elephant" data-anim="float" data-size="xlarge">
+                        <span class="icon">🐘</span>
+                        <span class="label">Elephant</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐎" data-name="Horse" data-anim="float" data-size="large">
+                        <span class="icon">🐎</span>
+                        <span class="label">Horse</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🪆" data-name="Doll" data-anim="sway" data-size="large">
+                        <span class="icon">🪆</span>
+                        <span class="label">Doll</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🎎" data-name="Couple" data-anim="sway" data-size="large">
+                        <span class="icon">🎎</span>
+                        <span class="label">Couple</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="toysbox" data-name="Toys Box">
+                        <span class="icon">📦</span>
+                        <span class="label">Toys Box</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Farming Tools -->
+            <div class="palette-section">
+                <h3>🚜 Farming <span class="badge">NEW</span></h3>
+                <div class="palette-items">
+                    <div class="palette-item" draggable="true" data-icon="🪣" data-name="Bucket" data-size="medium">
+                        <span class="icon">🪣</span>
+                        <span class="label">Bucket</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🧺" data-name="Basket" data-size="medium">
+                        <span class="icon">🧺</span>
+                        <span class="label">Basket</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="⚙️" data-name="Wheel" data-anim="pulse" data-size="large">
+                        <span class="icon">⚙️</span>
+                        <span class="label">Wheel</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="haystack" data-name="Haystack">
+                        <span class="icon">🌾</span>
+                        <span class="label">Haystack</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="fence" data-name="Fence">
+                        <span class="icon">🚧</span>
+                        <span class="label">Fence</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="scarecrow" data-name="Scarecrow">
+                        <span class="icon">🎃</span>
+                        <span class="label">Scarecrow</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- More Animals -->
+            <div class="palette-section">
+                <h3>🐔 More Animals</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="🐑" data-name="Sheep" data-anim="graze" data-size="medium">
+                        <span class="icon">🐑</span>
+                        <span class="label">Sheep</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐔" data-name="Hen" data-anim="walk" data-size="medium">
+                        <span class="icon">🐔</span>
+                        <span class="label">Hen</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🦆" data-name="Duck" data-anim="walk" data-size="medium">
+                        <span class="icon">🦆</span>
+                        <span class="label">Duck</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐖" data-name="Pig" data-anim="graze" data-size="medium">
+                        <span class="icon">🐖</span>
+                        <span class="label">Pig</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐇" data-name="Rabbit" data-anim="bounce" data-size="medium">
+                        <span class="icon">🐇</span>
+                        <span class="label">Rabbit</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🐈" data-name="Cat" data-anim="sway" data-size="medium">
+                        <span class="icon">🐈</span>
+                        <span class="label">Cat</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traditional Items -->
+            <div class="palette-section">
+                <h3>🪅 Traditional</h3>
+                <div class="palette-items">
+                    <div class="palette-item" draggable="true" data-icon="🪅" data-name="Maracas" data-size="medium">
+                        <span class="icon">🪅</span>
+                        <span class="label">Maracas</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🎪" data-name="Tent" data-size="xlarge">
+                        <span class="icon">🎪</span>
+                        <span class="label">Tent</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🏮" data-name="Lantern" data-size="large">
+                        <span class="icon">🏮</span>
+                        <span class="label">Lantern</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🎏" data-name="Banner" data-size="large">
+                        <span class="icon">🎏</span>
+                        <span class="label">Banner</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🪘" data-name="Drum" data-size="medium">
+                        <span class="icon">🪘</span>
+                        <span class="label">Drum</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🎭" data-name="Masks" data-size="large">
+                        <span class="icon">🎭</span>
+                        <span class="label">Masks</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nature & Decor -->
+            <div class="palette-section">
+                <h3>🌸 Nature & Decor</h3>
+                <div class="palette-items">
+                    <div class="palette-item animated" draggable="true" data-icon="🌻" data-name="Sunflower" data-anim="sway" data-size="large">
+                        <span class="icon">🌻</span>
+                        <span class="label">Sunflower</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🌸" data-name="Flower" data-anim="sway" data-size="medium">
+                        <span class="icon">🌸</span>
+                        <span class="label">Flower</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🪷" data-name="Lotus" data-anim="float" data-size="large">
+                        <span class="icon">🪷</span>
+                        <span class="label">Lotus</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🌾" data-name="Wheat" data-anim="sway" data-size="large">
+                        <span class="icon">🌾</span>
+                        <span class="label">Wheat</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🎋" data-name="Bamboo" data-anim="sway" data-size="xlarge">
+                        <span class="icon">🎋</span>
+                        <span class="label">Bamboo</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🪔" data-name="Diya" data-anim="pulse" data-size="medium">
+                        <span class="icon">🪔</span>
+                        <span class="label">Diya</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🏺" data-name="Pot" data-size="large">
+                        <span class="icon">🏺</span>
+                        <span class="label">Pot</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🌺" data-name="Hibiscus" data-anim="sway" data-size="medium">
+                        <span class="icon">🌺</span>
+                        <span class="label">Hibiscus</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🥥" data-name="Coconut" data-anim="float" data-size="medium">
+                        <span class="icon">🥥</span>
+                        <span class="label">Coconut</span>
+                    </div>
+                    <div class="palette-item animated" draggable="true" data-icon="🥭" data-name="Mango" data-anim="float" data-size="medium">
+                        <span class="icon">🥭</span>
+                        <span class="label">Mango</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-icon="🍌" data-name="Banana" data-size="medium">
+                        <span class="icon">🍌</span>
+                        <span class="label">Banana</span>
+                    </div>
+                    <div class="palette-item" draggable="true" data-type="label" data-name="Label">
+                        <span class="icon">🏷️</span>
+                        <span class="label">Label</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-area">
+            <div class="canvas-header">
+                <label>Sky:
+                    <select id="skySelect" onchange="changeSky()">
+                        <option value="day">Bright Day</option>
+                        <option value="morning">Morning</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="night">Night</option>
+                        <option value="clear">Clear Blue</option>
+                    </select>
+                </label>
+                <label>Ground:
+                    <select id="groundSelect" onchange="changeGround()">
+                        <option value="grass">Green Grass</option>
+                        <option value="dry">Dry Grass</option>
+                        <option value="soil">Brown Soil</option>
+                        <option value="sandy">Sandy</option>
+                        <option value="farm">Farm Field</option>
+                        <option value="plain">Plain Green</option>
+                        <option value="none">No Ground (Empty)</option>
+                    </select>
+                </label>
+                <label>
+                    <input type="checkbox" id="cartMoving" onchange="toggleCartMoving()"> Animate Carts
+                </label>
+            </div>
+
+            <div class="scene-canvas" id="canvas">
+                <div class="sky-layer sky-day" id="skyLayer">
+                    <div class="static-sun" id="sun"></div>
+                    <div class="static-moon" id="moon"></div>
+                    <div class="static-stars" id="stars">
+                        <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+                        <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+                    </div>
+                </div>
+                <div class="ground-layer ground-grass" id="groundLayer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        Drag from palette → Drop on canvas → Move to reposition → Hover for <kbd>×</kbd> delete → <kbd>Del</kbd> to remove selected
+    </div>
+
+    <script>
+        let elementId = 0;
+        let selectedElement = null;
+
+        // Setup drag and drop
+        document.querySelectorAll('.palette-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+        });
+
+        const canvas = document.getElementById('canvas');
+        canvas.addEventListener('dragover', handleDragOver);
+        canvas.addEventListener('dragleave', handleDragLeave);
+        canvas.addEventListener('drop', handleDrop);
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                icon: e.target.dataset.icon,
+                name: e.target.dataset.name,
+                anim: e.target.dataset.anim,
+                type: e.target.dataset.type,
+                size: e.target.dataset.size || 'medium'
+            }));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            canvas.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            canvas.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            canvas.classList.remove('drag-over');
+
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - 30;
+            const y = e.clientY - rect.top - 30;
+
+            createElement(data, x, y);
+        }
+
+        function createElement(data, x, y) {
+            const el = document.createElement('div');
+            el.className = 'dropped-element';
+            el.id = 'element-' + (++elementId);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            const moving = document.getElementById('cartMoving').checked;
+
+            // CSS-drawn elements
+            if (data.type === 'tree') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-tree"><div class="foliage"></div><div class="trunk"></div></div>`;
+            } else if (data.type === 'pine') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-pine"><div class="layer layer-1"></div><div class="layer layer-2"></div><div class="layer layer-3"></div><div class="trunk"></div></div>`;
+            } else if (data.type === 'palm') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-palm"><div class="frond"></div><div class="frond"></div><div class="frond"></div><div class="frond"></div><div class="frond"></div><div class="frond"></div><div class="trunk"></div></div>`;
+            } else if (data.type === 'hut') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-hut"><div class="hut-roof"></div><div class="hut-body"><div class="hut-door"></div></div></div>`;
+            } else if (data.type === 'temple') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-temple"><div class="gopuram"></div><div class="body"><div class="pillars"><div class="pillar"></div><div class="pillar"></div></div></div></div>`;
+            } else if (data.type === 'cloud') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button><div class="css-cloud"></div>`;
+                el.className += ' anim-float';
+            } else if (data.type === 'pond') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button><div class="css-pond"></div>`;
+            } else if (data.type === 'well') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-well"><div class="well-roof"></div><div class="well-post well-post-l"></div><div class="well-post well-post-r"></div><div class="well-base"></div></div>`;
+            } else if (data.type === 'haystack') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-haystack"><div class="hay-body"></div></div>`;
+            } else if (data.type === 'fence') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-fence"><div class="fence-bar fence-bar-1"></div><div class="fence-bar fence-bar-2"></div><div class="fence-post"></div><div class="fence-post"></div><div class="fence-post"></div><div class="fence-post"></div></div>`;
+            } else if (data.type === 'scarecrow') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="css-scarecrow"><div class="scare-hat"></div><div class="scare-head"></div><div class="scare-arms"></div><div class="scare-shirt"></div><div class="scare-pole"></div></div>`;
+            }
+            // Bullock Carts
+            else if (data.type === 'cart1') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="bullock-cart-1 ${moving ? 'moving' : ''}">
+                        <span class="bullock-emoji">🐂</span>
+                        <div class="cart-part"><div class="cart-pole"></div><div class="cart-body"></div><div class="cart-wheel wheel-l"></div><div class="cart-wheel wheel-r"></div></div>
+                    </div>`;
+            } else if (data.type === 'cart2') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="bullock-cart-2">
+                        <div class="bullock-pair"><span>🐂</span><span>🐂</span></div>
+                        <div class="fancy-cart"><div class="cart-canopy"></div><div class="cart-base"><div class="cart-decor">👸</div></div><div class="wheel wheel-l"></div><div class="wheel wheel-r"></div></div>
+                    </div>`;
+            } else if (data.type === 'cart3') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="bullock-cart-3">
+                        <span class="ox">🐃</span>
+                        <div class="simple-cart"><div class="cart-box"></div><div class="whl whl-l"></div><div class="whl whl-r"></div></div>
+                    </div>`;
+            } else if (data.type === 'cart4') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="bullock-cart-4">
+                        <span class="royal-ox">🐂</span>
+                        <div class="royal-cart"><div class="royal-top"></div><div class="royal-body"><div class="royal-emblem">👑</div></div><div class="gold-wheel gold-wheel-l"></div><div class="gold-wheel gold-wheel-r"></div></div>
+                    </div>`;
+            }
+            // Special elements
+            else if (data.type === 'toysbox') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="toys-box"><span class="toy-item">🐘</span><span class="toy-item">🦚</span><span class="toy-item">🐎</span><span class="toy-item">🪆</span></div>`;
+            } else if (data.type === 'label') {
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <div class="scene-label-el">Kondapalli Village</div>`;
+            }
+            // Emoji elements
+            else {
+                const animClass = data.anim ? 'anim-' + data.anim : '';
+                el.className += ' ' + animClass;
+                el.innerHTML = `<button class="delete-btn" onclick="deleteElement('${el.id}')">×</button>
+                    <span class="element-icon ${data.size}">${data.icon}</span>`;
+            }
+
+            el.addEventListener('mousedown', startDrag);
+            el.addEventListener('click', selectElement);
+            canvas.appendChild(el);
+        }
+
+        function deleteElement(id) {
+            document.getElementById(id)?.remove();
+        }
+
+        function selectElement(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.dropped-element').forEach(el => el.classList.remove('selected'));
+            e.currentTarget.classList.add('selected');
+            selectedElement = e.currentTarget;
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (e.target === canvas || e.target.classList.contains('sky-layer') || e.target.classList.contains('ground-layer')) {
+                document.querySelectorAll('.dropped-element').forEach(el => el.classList.remove('selected'));
+                selectedElement = null;
+            }
+        });
+
+        // Dragging logic
+        let isDragging = false;
+        let dragTarget = null;
+        let offsetX, offsetY;
+
+        function startDrag(e) {
+            if (e.target.classList.contains('delete-btn')) return;
+            isDragging = true;
+            dragTarget = e.currentTarget;
+            const rect = dragTarget.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            dragTarget.style.zIndex = 1000;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !dragTarget) return;
+            const canvasRect = canvas.getBoundingClientRect();
+            let x = e.clientX - canvasRect.left - offsetX;
+            let y = e.clientY - canvasRect.top - offsetY;
+            x = Math.max(-20, Math.min(x, canvasRect.width - 30));
+            y = Math.max(-20, Math.min(y, canvasRect.height - 30));
+            dragTarget.style.left = x + 'px';
+            dragTarget.style.top = y + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (dragTarget) dragTarget.style.zIndex = 10;
+            isDragging = false;
+            dragTarget = null;
+        });
+
+        // Sky change
+        function changeSky() {
+            const sky = document.getElementById('skySelect').value;
+            const skyLayer = document.getElementById('skyLayer');
+            const sun = document.getElementById('sun');
+            const moon = document.getElementById('moon');
+            const stars = document.getElementById('stars');
+
+            skyLayer.className = 'sky-layer';
+            sun.style.display = 'none';
+            moon.style.display = 'none';
+            stars.style.display = 'none';
+
+            if (sky === 'day') {
+                skyLayer.classList.add('sky-day');
+                sun.style.display = 'block';
+            } else if (sky === 'morning') {
+                skyLayer.classList.add('sky-morning');
+                sun.style.display = 'block';
+            } else if (sky === 'sunset') {
+                skyLayer.classList.add('sky-sunset');
+                sun.style.display = 'block';
+            } else if (sky === 'night') {
+                skyLayer.classList.add('sky-night');
+                moon.style.display = 'block';
+                stars.style.display = 'block';
+            } else if (sky === 'clear') {
+                skyLayer.classList.add('sky-clear');
+                sun.style.display = 'block';
+            }
+        }
+
+        // Ground change
+        function changeGround() {
+            const ground = document.getElementById('groundSelect').value;
+            const groundLayer = document.getElementById('groundLayer');
+            groundLayer.className = 'ground-layer ground-' + ground;
+        }
+
+        function toggleCartMoving() {
+            const moving = document.getElementById('cartMoving').checked;
+            document.querySelectorAll('.bullock-cart-1').forEach(cart => {
+                cart.classList.toggle('moving', moving);
+            });
+        }
+
+        function clearCanvas() {
+            document.querySelectorAll('.dropped-element').forEach(el => el.remove());
+        }
+
+        function exportDesign() {
+            const count = document.querySelectorAll('.dropped-element').length;
+            alert(`Design ready! Elements placed: ${count}\n\nTell me what you like about this design and I will implement it in your main site!`);
+        }
+
+        // Keyboard delete
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
+                selectedElement.remove();
+                selectedElement = null;
+            }
+        });
+    </script>
+</body>
+</html>

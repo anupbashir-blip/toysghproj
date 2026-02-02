@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Thank you for your order at Kondappali Toys.">
+    <title>Order Confirmed - Kondappali Toys</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .success-section {
+            padding: 80px 0;
+            text-align: center;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounceIn 0.6s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .success-content h1 {
+            color: #28a745;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        .success-content p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .order-number {
+            background: var(--cream);
+            padding: 15px 25px;
+            border-radius: var(--radius-md);
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        .success-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <span>🚚 Free Shipping on orders over $50</span>
+                <div class="header-top-right">
+                    <a href="orders.html">📦 Track Order</a>
+                    <span>📞 1-800-KONDAPALLI</span>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🎨</span>
+                    <span>Kondappali<span class="logo-accent">Toys</span></span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="orders.html">Track Order</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-link">
+                        🛒
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="success-section">
+            <div class="container">
+                <div class="success-content">
+                    <div class="success-icon">✅</div>
+                    <h1>Order Confirmed!</h1>
+                    <p>Thank you for your purchase! We've received your order and will begin processing it right away.</p>
+                    <p>A confirmation email has been sent to your email address with your order details.</p>
+
+                    <div class="order-number" id="orderNumber">
+                        Loading order details...
+                    </div>
+
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        You can track your order status using the Track Order page.
+                    </p>
+
+                    <div class="success-actions">
+                        <a href="orders.html" class="btn btn-primary">Track Order</a>
+                        <a href="products.html" class="btn btn-secondary">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <span>&copy; 2024 Kondappali Toys. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        // Clear the cart after successful order
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get session ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+
+            if (sessionId) {
+                // Display truncated session ID as order reference
+                const shortId = sessionId.slice(-12).toUpperCase();
+                document.getElementById('orderNumber').textContent = `Order Ref: KT-${shortId}`;
+
+                // Clear the cart
+                localStorage.removeItem('kondappaliCart');
+
+                // Update cart count display
+                const cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(el => el.textContent = '0');
+            } else {
+                document.getElementById('orderNumber').textContent = 'Order placed successfully!';
+            }
+        });
+    </script>
+</body>
+</html>

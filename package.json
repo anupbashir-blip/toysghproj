@@ -1,0 +1,25 @@
+{
+  "name": "kondappali-toys",
+  "version": "1.0.0",
+  "description": "Kondappali Toys E-commerce Website",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step needed for static site'"
+  },
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "keywords": [
+    "kondappali",
+    "toys",
+    "handicrafts",
+    "indian-art"
+  ],
+  "author": "",
+  "license": "ISC"
+}

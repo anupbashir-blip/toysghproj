@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review your shopping cart and proceed to checkout.">
+    <title>Shopping Cart - Kondappali Toys</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/orders.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="container">
+                <span>🚚 Free Shipping on orders over $50</span>
+                <div class="header-top-right">
+                    <a href="orders.html">📦 Track Order</a>
+                    <span>📞 1-800-KONDAPALLI</span>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🎨</span>
+                    <span>Kondappali<span class="logo-accent">Toys</span></span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="orders.html">Track Order</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="cart.html" class="cart-link active">
+                        🛒
+                        <span class="cart-count">0</span>
+                    </a>
+                    <button class="menu-toggle" aria-label="Toggle menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">Shopping Cart</h1>
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <span>Cart</span>
+                </nav>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section class="cart-section">
+            <div class="container">
+                <!-- Empty Cart State -->
+                <div class="empty-cart" id="emptyCart" style="display: none;">
+                    <span class="empty-cart-icon">🛒</span>
+                    <h2>Your cart is empty</h2>
+                    <p>Looks like you haven't added any toys to your cart yet. Explore our collection and find something special!</p>
+                    <a href="products.html" class="btn btn-primary">Start Shopping</a>
+                </div>
+
+                <!-- Cart Content -->
+                <div class="cart-content" id="cartContent" style="display: none;">
+                    <div class="cart-items-container">
+                        <div class="cart-header">
+                            <h2>Cart Items <span id="itemCount"></span></h2>
+                            <button class="btn btn-secondary" onclick="clearCart()">Clear Cart</button>
+                        </div>
+                        <div id="cartItems">
+                            <!-- Cart items will be loaded dynamically -->
+                        </div>
+                    </div>
+                    <aside class="cart-summary">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping">$0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="total">$0</span>
+                        </div>
+                        <div class="free-shipping-note">
+                            🚚 Free shipping on orders over $50
+                        </div>
+                        <a href="checkout.html" class="btn btn-primary">Proceed to Checkout</a>
+                        <a href="products.html" class="btn btn-secondary">Continue Shopping</a>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">🎨</span>
+                        <span>Kondappali<span class="logo-accent">Toys</span></span>
+                    </a>
+                    <p>Preserving and promoting the ancient art of handcrafted wooden collectibles. Every piece is a masterpiece of folk art tradition.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="Pinterest">📌</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="products.html">All Products</a></li>
+                        <li><a href="products.html?category=deities">Deities</a></li>
+                        <li><a href="products.html?category=animals">House Warming Gifts</a></li>
+                        <li><a href="products.html?category=village-life">Village Life</a></li>
+                        <li><a href="products.html?category=decorative">Decorative</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Our Artisans</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="orders.html">Track Order</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Care Instructions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-payment">
+                <h4>Secure Payment</h4>
+                <div class="payment-icons">
+                    <span class="payment-icon">💳 Visa</span>
+                    <span class="payment-icon">💳 Mastercard</span>
+                    <span class="payment-icon">💳 Amex</span>
+                    <span class="payment-icon">🅿️ PayPal</span>
+                    <span class="payment-icon">🍎 Apple Pay</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2024 Kondappali Toys. All rights reserved.</span>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

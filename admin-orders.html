@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin - Orders | Kondappali Toys</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .admin-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+        }
+        .admin-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+        .login-form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .orders-table {
+            width: 100%;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        .orders-table th,
+        .orders-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .orders-table th {
+            background: var(--cream);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .orders-table tr:hover {
+            background: var(--gray-100);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .order-items-list {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        .error-message {
+            background: #fee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+        .refresh-btn:hover {
+            background: var(--primary-dark);
+        }
+        @media (max-width: 768px) {
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Login Form (shown first) -->
+        <div id="loginSection">
+            <div class="login-form">
+                <h2>🔐 Admin Login</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px; text-align: center;">
+                    Enter your admin key to view orders
+                </p>
+                <div class="form-group">
+                    <label for="adminKey">Admin Key</label>
+                    <input type="password" id="adminKey" placeholder="Enter admin secret key">
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="login()">
+                    View Orders
+                </button>
+                <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                    <a href="index.html">← Back to Store</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Orders Dashboard (shown after login) -->
+        <div id="dashboardSection" style="display: none;">
+            <div class="admin-header">
+                <h1 class="admin-title">📦 Orders Dashboard</h1>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh</button>
+                    <a href="index.html" class="btn btn-secondary">← Back to Store</a>
+                </div>
+            </div>
+
+            <div class="admin-stats" id="statsSection">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalOrders">-</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRevenue">-</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayOrders">-</div>
+                    <div class="stat-label">Today's Orders</div>
+                </div>
+            </div>
+
+            <div id="ordersContent" style="margin-top: 30px;">
+                <div class="loading">Loading orders...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminKey = '';
+
+        function login() {
+            adminKey = document.getElementById('adminKey').value;
+            if (!adminKey) {
+                alert('Please enter admin key');
+                return;
+            }
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            loadOrders();
+        }
+
+        // Allow Enter key to login
+        document.getElementById('adminKey').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        async function loadOrders() {
+            const content = document.getElementById('ordersContent');
+            content.innerHTML = '<div class="loading">Loading orders...</div>';
+
+            try {
+                const response = await fetch(`/api/get-orders?key=${encodeURIComponent(adminKey)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load orders');
+                }
+
+                if (data.orders.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 60px; background: var(--white); border-radius: var(--radius-lg);">
+                            <span style="font-size: 4rem;">📭</span>
+                            <h3 style="margin-top: 20px;">No Orders Yet</h3>
+                            <p style="color: var(--text-secondary);">Orders will appear here after customers make purchases.</p>
+                        </div>
+                    `;
+                    updateStats(data.orders);
+                    return;
+                }
+
+                // Render orders table
+                content.innerHTML = `
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.orders.map(order => `
+                                <tr>
+                                    <td><code>${order.stripe_session_id?.slice(-8) || order.id}</code></td>
+                                    <td>${new Date(order.created_at).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</td>
+                                    <td>
+                                        <strong>${order.customer_name || 'Guest'}</strong><br>
+                                        <small>${order.customer_email}</small>
+                                    </td>
+                                    <td>
+                                        <div class="order-items-list">
+                                            ${order.items ? order.items.map(item =>
+                                                `${item.quantity}x ${item.name}`
+                                            ).join('<br>') : '-'}
+                                        </div>
+                                    </td>
+                                    <td><strong>$${order.amount_total?.toFixed(2) || '0.00'}</strong></td>
+                                    <td><span class="status-badge status-${order.order_status}">${order.order_status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                updateStats(data.orders);
+
+            } catch (error) {
+                content.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${error.message}
+                        <br><br>
+                        <button class="btn btn-secondary" onclick="loadOrders()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats(orders) {
+            const totalOrders = orders.length;
+            const totalRevenue = orders.reduce((sum, o) => sum + (o.amount_total || 0), 0);
+            const today = new Date().toDateString();
+            const todayOrders = orders.filter(o => new Date(o.created_at).toDateString() === today).length;
+
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('todayOrders').textContent = todayOrders;
+        }
+    </script>
+</body>
+</html>

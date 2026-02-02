@@ -297,7 +297,7 @@
 
     <script src="js/data.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/cart.js"></script>
+    <!-- Note: cart.js removed - it has a conflicting checkout handler that bypasses Stripe -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const cart = Cart.getCart();

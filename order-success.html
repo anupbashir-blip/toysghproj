@@ -139,13 +139,14 @@
     <script src="js/main.js"></script>
     <script src="js/theme.js"></script>
     <script>
-        // Clear the cart after successful order
+        // Verify order and clear cart
         document.addEventListener('DOMContentLoaded', () => {
             // Get session ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const sessionId = urlParams.get('session_id');
 
-            if (sessionId) {
+            if (sessionId && sessionId.startsWith('cs_')) {
+                // Valid Stripe session ID format
                 // Display truncated session ID as order reference
                 const shortId = sessionId.slice(-12).toUpperCase();
                 document.getElementById('orderNumber').textContent = `Order Ref: KT-${shortId}`;
@@ -156,8 +157,19 @@
                 // Update cart count display
                 const cartCountElements = document.querySelectorAll('.cart-count');
                 cartCountElements.forEach(el => el.textContent = '0');
+
+                console.log('Order confirmed with session:', sessionId);
             } else {
-                document.getElementById('orderNumber').textContent = 'Order placed successfully!';
+                // No valid session ID - redirect to cart
+                console.warn('No valid session ID found, redirecting to cart');
+                document.querySelector('.success-content h1').textContent = 'Invalid Order';
+                document.querySelector('.success-content p').textContent = 'No valid payment session found. Please try again.';
+                document.getElementById('orderNumber').style.display = 'none';
+
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'cart.html';
+                }, 3000);
             }
         });
     </script>

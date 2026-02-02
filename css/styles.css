@@ -4959,7 +4959,11 @@ input, select, textarea {
     .products-grid,
     .products-carousel {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-sm);
+        gap: var(--space-md);
+    }
+
+    .product-card {
+        min-width: 0;
     }
 
     .products-grid.list-view .product-card {
@@ -5026,5 +5030,24 @@ input, select, textarea {
     .quantity-selector {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    /* Mobile: Single column for featured products */
+    .products-grid,
+    .products-carousel {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .product-card {
+        max-width: 100%;
+    }
+
+    .product-info {
+        padding: 12px;
+    }
+
+    .product-name {
+        font-size: 1rem;
     }
 }

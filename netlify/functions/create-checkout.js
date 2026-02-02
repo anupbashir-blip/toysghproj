@@ -1,16 +1,51 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-exports.handler = async (event) => {
-    // Only allow POST requests
+exports.handler = async (event, context) => {
+    // CORS headers
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Content-Type': 'application/json'
+    };
+
+    // Handle preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
+    }
+
+    // Only allow POST
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers,
             body: JSON.stringify({ error: 'Method not allowed' })
+        };
+    }
+
+    // Check if Stripe key is configured
+    if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('STRIPE_SECRET_KEY not configured');
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ error: 'Payment system not configured' })
         };
     }
 
     try {
         const { items, customerEmail } = JSON.parse(event.body);
+
+        if (!items || items.length === 0) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'No items in cart' })
+            };
+        }
+
+        // Get site URL
+        const siteUrl = process.env.URL || `https://${event.headers.host}`;
 
         // Create line items for Stripe
         const lineItems = items.map(item => ({
@@ -18,42 +53,32 @@ exports.handler = async (event) => {
                 currency: 'usd',
                 product_data: {
                     name: item.name,
-                    images: item.image ? [`${process.env.URL}/${item.image}`] : [],
-                    description: item.description || `Handcrafted Kondappali Toy - ${item.name}`
+                    description: `Handcrafted Kondappali Toy`
                 },
-                unit_amount: Math.round(item.price * 100), // Stripe expects cents
+                unit_amount: Math.round(item.price * 100),
             },
             quantity: item.quantity,
         }));
-
-        // Shipping is FREE for testing
-        // To re-enable shipping, uncomment below:
-        // const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        // const shippingCost = subtotal >= 50 ? 0 : 5.99;
-        // if (shippingCost > 0) { ... }
 
         // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${process.env.URL}/order-success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.URL}/cart.html`,
+            success_url: `${siteUrl}/order-success.html?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${siteUrl}/cart.html`,
             customer_email: customerEmail || undefined,
             billing_address_collection: 'required',
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU', 'IN'],
-            },
-            metadata: {
-                order_source: 'kondappali_toys_website'
             }
         });
 
+        console.log('Checkout session created:', session.id);
+
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 sessionId: session.id,
                 url: session.url
@@ -61,11 +86,12 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error('Stripe error:', error);
+        console.error('Stripe error:', error.message);
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({
-                error: 'Failed to create checkout session',
+                error: 'Failed to create checkout',
                 message: error.message
             })
         };

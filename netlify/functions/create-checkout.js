@@ -26,24 +26,11 @@ exports.handler = async (event) => {
             quantity: item.quantity,
         }));
 
-        // Calculate if shipping should be free (over $50)
-        const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const shippingCost = subtotal >= 50 ? 0 : 5.99;
-
-        // Add shipping as a line item if not free
-        if (shippingCost > 0) {
-            lineItems.push({
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: 'Shipping',
-                        description: 'Standard shipping (Free on orders over $50)'
-                    },
-                    unit_amount: Math.round(shippingCost * 100),
-                },
-                quantity: 1,
-            });
-        }
+        // Shipping is FREE for testing
+        // To re-enable shipping, uncomment below:
+        // const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        // const shippingCost = subtotal >= 50 ? 0 : 5.99;
+        // if (shippingCost > 0) { ... }
 
         // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({

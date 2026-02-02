@@ -88,7 +88,8 @@ function updateCartSummary() {
     const itemCountEl = document.getElementById('itemCount');
 
     const subtotal = Cart.getTotal();
-    const shipping = subtotal > 0 ? (subtotal >= 2000 ? 0 : 150) : 0;
+    // Free shipping over $50, otherwise $5.99 flat rate
+    const shipping = subtotal > 0 ? (subtotal >= 50 ? 0 : 5.99) : 0;
     const total = subtotal + shipping;
 
     if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
@@ -143,7 +144,8 @@ function renderOrderSummary() {
     container.innerHTML = html;
 
     const subtotal = Cart.getTotal();
-    const shipping = subtotal >= 2000 ? 0 : 150;
+    // Free shipping over $50, otherwise $5.99 flat rate
+    const shipping = subtotal >= 50 ? 0 : 5.99;
     const total = subtotal + shipping;
 
     if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
@@ -256,8 +258,8 @@ function processOrder() {
         },
         items: Cart.items,
         subtotal: Cart.getTotal(),
-        shipping: Cart.getTotal() >= 2000 ? 0 : 150,
-        total: Cart.getTotal() + (Cart.getTotal() >= 2000 ? 0 : 150)
+        shipping: Cart.getTotal() >= 50 ? 0 : 5.99,
+        total: Cart.getTotal() + (Cart.getTotal() >= 50 ? 0 : 5.99)
     };
 
     // Save order to localStorage (for demo)

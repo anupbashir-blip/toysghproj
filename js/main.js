@@ -50,6 +50,11 @@ const Cart = {
         }
     },
 
+    getCart() {
+        this.load(); // Ensure we have latest data
+        return this.items;
+    },
+
     getTotal() {
         return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
     },

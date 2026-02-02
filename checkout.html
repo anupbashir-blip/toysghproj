@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Complete your order securely with our easy checkout process.">
     <title>Checkout - Kondappali Toys</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/themes.css">
@@ -11,27 +10,177 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .checkout-loading {
+        .checkout-page {
+            min-height: 80vh;
+            padding: 40px 0;
+            background: var(--cream);
+        }
+        .checkout-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .checkout-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .checkout-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .checkout-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        .checkout-body {
+            padding: 30px;
+        }
+        .order-preview {
+            background: var(--gray-100);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .order-preview h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        .preview-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .preview-item-info {
+            flex: 1;
+        }
+        .preview-item-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .preview-item-qty {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .preview-item-price {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 2px solid var(--gray-200);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .order-total span:last-child {
+            color: var(--primary);
+        }
+        .form-section {
+            margin-bottom: 25px;
+        }
+        .form-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .form-section input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .form-section input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #635bff 0%, #7a73ff 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 91, 255, 0.4);
+        }
+        .checkout-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-box.show {
+            display: block;
+        }
+        .loading-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255,255,255,0.95);
             z-index: 9999;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
-        .checkout-loading.active {
+        .loading-overlay.show {
             display: flex;
         }
-        .loading-spinner {
+        .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
+            border: 4px solid #e5e7eb;
+            border-top-color: #635bff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -40,320 +189,199 @@
         }
         .loading-text {
             margin-top: 20px;
-            font-size: 1.1rem;
             color: var(--text-secondary);
+            font-size: 1rem;
         }
-        .stripe-badge {
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: var(--primary);
+        }
+        .simple-header {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .simple-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .simple-header .logo {
+            text-decoration: none;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: linear-gradient(135deg, #635bff 0%, #7a73ff 100%);
-            border-radius: var(--radius-md);
-            color: white;
-            margin-top: 20px;
+            gap: 8px;
         }
-        .stripe-badge svg {
-            height: 24px;
+        .simple-header .logo-icon {
+            font-size: 1.5rem;
         }
-        .checkout-error {
-            background: #fee;
-            border: 1px solid #f44336;
-            color: #c62828;
-            padding: 15px;
-            border-radius: var(--radius-md);
-            margin-bottom: 20px;
-            display: none;
+        .simple-header .logo-text {
+            font-weight: 600;
+            color: var(--text-primary);
         }
-        .checkout-error.active {
-            display: block;
+        .simple-header .back-to-cart {
+            color: var(--text-secondary);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <!-- Loading Overlay -->
-    <div class="checkout-loading" id="checkoutLoading">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Redirecting to secure checkout...</p>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Redirecting to secure payment...</p>
     </div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <div class="container">
-                <span>🚚 Free Shipping on orders over $50</span>
-                <div class="header-top-right">
-                    <a href="orders.html">📦 Track Order</a>
-                    <span>📞 1-800-KONDAPALLI</span>
-                </div>
-            </div>
+    <!-- Simple Header -->
+    <header class="simple-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🎨</span>
+                <span class="logo-text">Kondappali Toys</span>
+            </a>
+            <a href="cart.html" class="back-to-cart">← Back to Cart</a>
         </div>
-        <nav class="navbar">
-            <div class="container">
-                <a href="index.html" class="logo">
-                    <span class="logo-icon">🎨</span>
-                    <span>Kondappali<span class="logo-accent">Toys</span></span>
-                </a>
-                <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="products.html">Shop</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="orders.html">Track Order</a></li>
-                </ul>
-                <div class="nav-actions">
-                    <a href="cart.html" class="cart-link">
-                        🛒
-                        <span class="cart-count">0</span>
-                    </a>
-                    <button class="menu-toggle" aria-label="Toggle menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-            </div>
-        </nav>
     </header>
 
-    <main>
-        <!-- Page Header -->
-        <section class="page-header">
-            <div class="container">
-                <h1 class="page-title">Checkout</h1>
-                <nav class="breadcrumb">
-                    <a href="index.html">Home</a>
-                    <span>/</span>
-                    <a href="cart.html">Cart</a>
-                    <span>/</span>
-                    <span>Checkout</span>
-                </nav>
-            </div>
-        </section>
+    <main class="checkout-page">
+        <div class="container">
+            <div class="checkout-container">
+                <div class="checkout-header">
+                    <h1>Secure Checkout</h1>
+                    <p>Complete your order in seconds</p>
+                </div>
 
-        <!-- Checkout Section -->
-        <section class="checkout-section">
-            <div class="container">
-                <div class="checkout-content">
-                    <!-- Checkout Form -->
-                    <div class="checkout-form-container">
-                        <div class="checkout-error" id="checkoutError">
-                            <strong>Error:</strong> <span id="errorMessage"></span>
+                <div class="checkout-body">
+                    <div class="error-box" id="errorBox"></div>
+
+                    <!-- Order Preview -->
+                    <div class="order-preview">
+                        <h3>Your Order</h3>
+                        <div id="orderItems">
+                            <!-- Items loaded dynamically -->
                         </div>
-
-                        <form id="checkoutForm">
-                            <h2>Contact Information</h2>
-                            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                                Enter your email to receive order confirmation. You'll provide shipping details on the secure payment page.
-                            </p>
-
-                            <div class="form-group">
-                                <label for="email">Email Address *</label>
-                                <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                                <span class="error-message"></span>
-                            </div>
-
-                            <div class="secure-checkout-badge">
-                                <span>🔒</span>
-                                <span>You'll be redirected to Stripe's secure checkout to complete your payment</span>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary place-order-btn" id="checkoutBtn">
-                                <span class="btn-icon">💳</span>
-                                Proceed to Payment - <span id="totalAmount">$0</span>
-                            </button>
-
-                            <div class="stripe-badge">
-                                <span>Powered by</span>
-                                <svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg" width="60" height="25" fill="white">
-                                    <path d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.56 1.1c-4.01 0-6.83-2.5-6.83-7.48 0-4.19 2.39-7.52 6.3-7.52 3.92 0 5.96 3.28 5.96 7.5 0 .4-.04 1.26-.06 1.48zm-5.92-5.62c-1.03 0-2.17.73-2.17 2.58h4.25c0-1.85-1.07-2.58-2.08-2.58zM40.95 20.3c-1.44 0-2.32-.6-2.9-1.04l-.02 4.63-4.12.87V5.57h3.76l.08 1.02a4.7 4.7 0 0 1 3.23-1.29c2.9 0 5.62 2.6 5.62 7.4 0 5.23-2.7 7.6-5.65 7.6zM40 9.46c-.87 0-1.57.38-1.97.95l.02 5.9c.4.58 1.1.95 1.95.95 1.51 0 2.53-1.64 2.53-3.88 0-2.27-1.05-3.92-2.53-3.92zM28.24 5.57h4.13v14.44h-4.13V5.57zm0-5.09L32.37 0v3.36l-4.13.88V.48zm-4.32 9.01v10.52h-4.13V5.57h3.76l.11 1.67c.78-1.9 2.51-1.88 3.14-1.88v3.9c-.63 0-2.25-.1-2.88 1.23zm-8.27 4.82c0 2.8-2.3 6.09-7.08 6.09H0V.56h8c4.19 0 6.65 2.41 6.65 5.49 0 2.02-.92 3.47-2.41 4.24 2.38.71 4.41 2.65 4.41 5.02zM4.13 8.26h3.29c1.85 0 2.68-1.06 2.68-2.2 0-1.11-.84-2.15-2.68-2.15H4.13v4.35zm5.44 3.89H4.13v4.6h5.47c1.6 0 2.79-.9 2.79-2.28 0-1.39-1.17-2.32-2.82-2.32z"/>
-                                </svg>
-                            </div>
-
-                            <div class="payment-logos" style="margin-top: 20px;">
-                                <span>💳 Visa</span>
-                                <span>💳 Mastercard</span>
-                                <span>💳 Amex</span>
-                                <span>🍎 Apple Pay</span>
-                            </div>
-                        </form>
+                        <div class="order-total">
+                            <span>Total</span>
+                            <span id="orderTotal">$0.00</span>
+                        </div>
                     </div>
 
-                    <!-- Order Summary -->
-                    <aside class="order-summary">
-                        <h3>Order Summary</h3>
-                        <div class="order-items" id="orderItems">
-                            <!-- Order items will be loaded dynamically -->
+                    <!-- Email Form -->
+                    <form id="checkoutForm">
+                        <div class="form-section">
+                            <label for="email">Email for order confirmation</label>
+                            <input type="email" id="email" placeholder="your@email.com" required>
                         </div>
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span id="orderSubtotal">$0</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Shipping</span>
-                            <span id="orderShipping">$0</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total</span>
-                            <span id="orderTotal">$0</span>
-                        </div>
-                        <div class="free-shipping-note">
-                            🚚 Free shipping on orders over $50
-                        </div>
-                        <a href="cart.html" class="btn btn-secondary" style="width: 100%; margin-top: var(--space-md);">
-                            ← Back to Cart
-                        </a>
-                    </aside>
-                </div>
-            </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="index.html" class="logo">
-                        <span class="logo-icon">🎨</span>
-                        <span>Kondappali<span class="logo-accent">Toys</span></span>
-                    </a>
-                    <p>Preserving and promoting the ancient art of handcrafted wooden collectibles.</p>
+                        <button type="submit" class="checkout-btn" id="payBtn">
+                            Pay <span id="payAmount">$0.00</span>
+                        </button>
+                    </form>
+
+                    <div class="secure-note">
+                        <span>🔒</span>
+                        <span>Secured by Stripe. Your payment info is safe.</span>
+                    </div>
+
+                    <a href="cart.html" class="back-link">← Return to cart</a>
                 </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="products.html">Shop</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Categories</h4>
-                    <ul>
-                        <li><a href="products.html?category=deities">Deities</a></li>
-                        <li><a href="products.html?category=animals">House Warming Gifts</a></li>
-                        <li><a href="products.html?category=village-life">Village Life</a></li>
-                        <li><a href="products.html?category=decorative">Decorative</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Shipping Info</a></li>
-                        <li><a href="#">Returns & Exchanges</a></li>
-                        <li><a href="#">FAQs</a></li>
-                        <li><a href="#">Care Instructions</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>&copy; 2024 Kondappali Toys. All rights reserved.</span>
             </div>
         </div>
-    </footer>
+    </main>
 
     <script src="js/data.js"></script>
     <script src="js/main.js"></script>
     <script src="js/cart.js"></script>
-    <script src="js/theme.js"></script>
     <script>
-        // Load order summary
         document.addEventListener('DOMContentLoaded', () => {
             const cart = Cart.getCart();
 
-            if (cart.length === 0) {
+            // Redirect if cart is empty
+            if (!cart || cart.length === 0) {
                 window.location.href = 'cart.html';
                 return;
             }
 
-            // Render order items
-            const orderItemsContainer = document.getElementById('orderItems');
-            orderItemsContainer.innerHTML = cart.map(item => `
-                <div class="order-item">
-                    <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-                    <div class="order-item-details">
-                        <strong>${item.name}</strong>
-                        <small>Qty: ${item.quantity}</small>
+            // Render items
+            const itemsHtml = cart.map(item => `
+                <div class="preview-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="preview-item-info">
+                        <div class="preview-item-name">${item.name}</div>
+                        <div class="preview-item-qty">Qty: ${item.quantity}</div>
                     </div>
-                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                    <div class="preview-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
                 </div>
             `).join('');
+            document.getElementById('orderItems').innerHTML = itemsHtml;
 
-            // Calculate totals
-            const subtotal = Cart.getTotal();
-            const shipping = subtotal >= 50 ? 0 : 5.99;
-            const total = subtotal + shipping;
-
-            document.getElementById('orderSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('orderShipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+            // Calculate total (no shipping for testing)
+            const total = Cart.getTotal();
             document.getElementById('orderTotal').textContent = `$${total.toFixed(2)}`;
-            document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('payAmount').textContent = `$${total.toFixed(2)}`;
         });
 
-        // Handle checkout form submission
+        // Handle form submission
         document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const cart = Cart.getCart();
+            const errorBox = document.getElementById('errorBox');
+            const payBtn = document.getElementById('payBtn');
 
-            if (cart.length === 0) {
-                showError('Your cart is empty');
+            if (!email) {
+                errorBox.textContent = 'Please enter your email address';
+                errorBox.classList.add('show');
+                return;
+            }
+
+            if (!cart || cart.length === 0) {
+                errorBox.textContent = 'Your cart is empty';
+                errorBox.classList.add('show');
                 return;
             }
 
             // Show loading
-            document.getElementById('checkoutLoading').classList.add('active');
-            document.getElementById('checkoutBtn').disabled = true;
+            document.getElementById('loadingOverlay').classList.add('show');
+            payBtn.disabled = true;
+            errorBox.classList.remove('show');
 
             try {
-                // Prepare items for Stripe
                 const items = cart.map(item => ({
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,
-                    image: item.image,
-                    description: item.description || ''
+                    image: item.image
                 }));
 
-                // Call Netlify function to create checkout session
-                const response = await fetch('/api/create-checkout', {
+                const response = await fetch('/.netlify/functions/create-checkout', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        items: items,
-                        customerEmail: email
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items, customerEmail: email })
                 });
 
                 const data = await response.json();
 
                 if (data.url) {
-                    // Redirect to Stripe Checkout
                     window.location.href = data.url;
                 } else {
-                    throw new Error(data.message || 'Failed to create checkout session');
+                    throw new Error(data.message || data.error || 'Payment setup failed');
                 }
-
             } catch (error) {
                 console.error('Checkout error:', error);
-                showError(error.message || 'Something went wrong. Please try again.');
-                document.getElementById('checkoutLoading').classList.remove('active');
-                document.getElementById('checkoutBtn').disabled = false;
+                document.getElementById('loadingOverlay').classList.remove('show');
+                payBtn.disabled = false;
+                errorBox.textContent = error.message || 'Something went wrong. Please try again.';
+                errorBox.classList.add('show');
             }
         });
-
-        function showError(message) {
-            const errorEl = document.getElementById('checkoutError');
-            document.getElementById('errorMessage').textContent = message;
-            errorEl.classList.add('active');
-            setTimeout(() => errorEl.classList.remove('active'), 5000);
-        }
     </script>
 </body>
 </html>
